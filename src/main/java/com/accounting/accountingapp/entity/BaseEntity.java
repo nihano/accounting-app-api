@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 
 
+@MappedSuperclass
 @NoArgsConstructor
 public class BaseEntity {
     @Id
