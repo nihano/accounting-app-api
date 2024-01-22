@@ -28,6 +28,9 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public Address createOrUpdateAddress(AddressDto addressDto) {
+
+        //this method is to check if address is already exist in the DB
+        //if address exists when create/update it will not create new foreign key in the company
         Address address = mapperUtil.convert(addressDto, new Address());
 
         Optional<Address> existingAddress = addressRepository.findByAddressDetails(
@@ -35,6 +38,7 @@ public class AddressServiceImpl implements AddressService {
                 address.getAddressLine2(),
                 address.getCity(),
                 address.getState(),
+                address.getCountry(),
                 address.getZipCode()
         );
 
