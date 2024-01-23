@@ -46,7 +46,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public List<CompanyDto> listCompanies() {
 
-        List<Company> companies = companyRepository.listCompaniesByStatus();
+        List<Company> companies = companyRepository.listCompaniesByStatusAndIsDeletedFalse();
         return companies.stream()
                 .map(company -> mapperUtil.convert(company, new CompanyDto()))
                 .collect(Collectors.toList());
@@ -64,29 +64,29 @@ public class CompanyServiceImpl implements CompanyService {
         //check if the address already exists in the DB and get the existing or create new one
         Address address = addressService.createOrUpdateAddress(companyDto.getAddress());
 
-        log.info("address: {} {}", address," id: "+ address.getId());
+        log.info("address: {} {}", address, " id: " + address.getId());
 
         company.setAddress(address);
         companyRepository.save(company);
     }
 
     @Override
-    public void update(CompanyDto companyDto,Long id){
-        Company company=companyRepository.findById(id).get();
-        log.info("Company in DB:{}",company);
+    public void update(CompanyDto companyDto, Long id) {
+        Company company = companyRepository.findById(id).get();
+        log.info("Company in DB:{}", company);
         company.setCompanyStatus(companyDto.getCompanyStatus());
         company.setTitle(companyDto.getTitle());
         company.setWebsite(companyDto.getWebsite());
         company.setPhone(companyDto.getPhone());
 
-        Address address=addressService.createOrUpdateAddress(companyDto.getAddress());
+        Address address = addressService.createOrUpdateAddress(companyDto.getAddress());
 
-        log.info("AddressDto:{}",companyDto.getAddress());
-        log.info("Address saved in the DB:{}{}",address,"primary_key: "+address.getId());
+        log.info("AddressDto:{}", companyDto.getAddress());
+        log.info("Address saved in the DB:{}{}", address, "primary_key: " + address.getId());
 
         company.setAddress(address);
 
-        log.info("Address updated in company:{}{}{}",company.getAddress(),"company_id"+company.getId(),"address_id:"+company.getAddress().getId());
+        log.info("Address updated in company:{}{}{}", company.getAddress(), "company_id" + company.getId(), "address_id:" + company.getAddress().getId());
 
         companyRepository.save(company);
     }
@@ -94,7 +94,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public void activateCompany(Long id) {
-        Company company = companyRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Company does not exist"));
+        Company company = companyRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Company does not exist"));
         if (company.getCompanyStatus().equals(CompanyStatus.PASSIVE)) {
             company.setCompanyStatus(CompanyStatus.ACTIVE);
         }
@@ -104,7 +104,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public void deactivateCompany(Long id) {
-        Company company = companyRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Company does not exist"));
+        Company company = companyRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Company does not exist"));
         if (company.getCompanyStatus().equals(CompanyStatus.ACTIVE)) {
             company.setCompanyStatus(CompanyStatus.PASSIVE);
         }
@@ -112,7 +112,18 @@ public class CompanyServiceImpl implements CompanyService {
         companyRepository.save(company);
     }
 
+    @Override
+    public void delete(Long id) {
+        Company company = companyRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Company does not exist"));
+        company.setDeleted(true);
+        companyRepository.save(company);
+    }
 
+    @Override
+    public CompanyDto getCompanyById(Long id) {
+         Company company = companyRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Company does not exist"));
+         return mapperUtil.convert(company, new CompanyDto());
+    }
 
 
 }
