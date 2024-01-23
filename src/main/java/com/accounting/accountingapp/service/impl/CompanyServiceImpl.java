@@ -1,6 +1,6 @@
 package com.accounting.accountingapp.service.impl;
 
-import com.accounting.accountingapp.dto.AddressDto;
+
 import com.accounting.accountingapp.dto.CompanyDto;
 import com.accounting.accountingapp.entity.Address;
 import com.accounting.accountingapp.entity.Company;
@@ -10,11 +10,12 @@ import com.accounting.accountingapp.repository.AddressRepository;
 import com.accounting.accountingapp.repository.CompanyRepository;
 import com.accounting.accountingapp.service.AddressService;
 import com.accounting.accountingapp.service.CompanyService;
-import lombok.ToString;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -23,15 +24,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CompanyServiceImpl implements CompanyService {
     private final CompanyRepository companyRepository;
-    ;
-    private final AddressRepository addressRepository;
     private final AddressService addressService;
+    private final AddressRepository addressRepository;
     private final MapperUtil mapperUtil;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository, AddressRepository addressRepository, AddressService addressService, MapperUtil mapperUtil) {
+    public CompanyServiceImpl(CompanyRepository companyRepository, AddressService addressService, AddressRepository addressRepository, MapperUtil mapperUtil) {
         this.companyRepository = companyRepository;
-        this.addressRepository = addressRepository;
         this.addressService = addressService;
+        this.addressRepository = addressRepository;
         this.mapperUtil = mapperUtil;
     }
 
@@ -59,31 +59,38 @@ public class CompanyServiceImpl implements CompanyService {
         companyDto.setCompanyStatus(CompanyStatus.PASSIVE);
         Company company = mapperUtil.convert(companyDto, new Company());
 
-//    Moved method to AddressServiceImp to reuse
-//        Address address = mapperUtil.convert(companyDto.getAddress(), new Address());
-//        Optional<Address> existingAddress = addressRepository.findByAddressDetails(
-//                address.getAddressLine1(),
-//                address.getAddressLine2(),
-//                address.getCity(),
-//                address.getState(),
-//                address.getCountry(),
-//                address.getZipCode()
-//        );
-//
-//        if (existingAddress.isPresent()) {
-//            address = existingAddress.get();
-//        } else {
-//            addressRepository.save(address);
-//        }
+        log.info("addressDto: {}", companyDto.getAddress());
 
         //check if the address already exists in the DB and get the existing or create new one
-        log.info("addressDto: {}", companyDto.getAddress());
         Address address = addressService.createOrUpdateAddress(companyDto.getAddress());
+
         log.info("address: {} {}", address," id: "+ address.getId());
 
         company.setAddress(address);
         companyRepository.save(company);
     }
+
+    @Override
+    public void update(CompanyDto companyDto,Long id){
+        Company company=companyRepository.findById(id).get();
+        log.info("Company in DB:{}",company);
+        company.setCompanyStatus(companyDto.getCompanyStatus());
+        company.setTitle(companyDto.getTitle());
+        company.setWebsite(companyDto.getWebsite());
+        company.setPhone(companyDto.getPhone());
+
+        Address address=addressService.createOrUpdateAddress(companyDto.getAddress());
+
+        log.info("AddressDto:{}",companyDto.getAddress());
+        log.info("Address saved in the DB:{}{}",address,"primary_key: "+address.getId());
+
+        company.setAddress(address);
+
+        log.info("Address updated in company:{}{}{}",company.getAddress(),"company_id"+company.getId(),"address_id:"+company.getAddress().getId());
+
+        companyRepository.save(company);
+    }
+
 
 
 
