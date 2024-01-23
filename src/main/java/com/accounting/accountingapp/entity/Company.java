@@ -4,6 +4,7 @@ import com.accounting.accountingapp.enums.CompanyStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -11,6 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 @Table(name = "companies")
 public class Company extends BaseEntity {
     @Column(unique = true)
