@@ -30,7 +30,7 @@ public class AddressServiceImpl implements AddressService {
     public Address createOrUpdateAddress(AddressDto addressDto) {
 
         //this method is to check if address is already exist in the DB
-        //if address exists when create/update it will not create new foreign key in the company
+        //if address does not exist when updating it will create it in db and new foreign key in the company when updating
         Address address = mapperUtil.convert(addressDto, new Address());
 
         Optional<Address> existingAddress = addressRepository.findByAddressDetails(
