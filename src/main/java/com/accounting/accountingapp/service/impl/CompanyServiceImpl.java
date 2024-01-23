@@ -92,6 +92,27 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
 
+    @Override
+    public void activateCompany(Long id) {
+        Company company = companyRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Company does not exist"));
+        if (company.getCompanyStatus().equals(CompanyStatus.PASSIVE)) {
+            company.setCompanyStatus(CompanyStatus.ACTIVE);
+        }
+
+        companyRepository.save(company);
+    }
+
+    @Override
+    public void deactivateCompany(Long id) {
+        Company company = companyRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Company does not exist"));
+        if (company.getCompanyStatus().equals(CompanyStatus.ACTIVE)) {
+            company.setCompanyStatus(CompanyStatus.PASSIVE);
+        }
+
+        companyRepository.save(company);
+    }
+
+
 
 
 }
