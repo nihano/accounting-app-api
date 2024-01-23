@@ -15,10 +15,12 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
             "a.addressLine2 = :addressLine2 AND " +
             "a.city = :city AND " +
             "a.state = :state AND " +
+            "a.country = :country AND " +
             "a.zipCode = :zipCode")
     Optional<Address> findByAddressDetails(@Param("addressLine1") String addressLine1,
                                            @Param("addressLine2") String addressLine2,
                                            @Param("city") String city,
                                            @Param("state") String state,
+                                           @Param("country") String country,
                                            @Param("zipCode") String zipCode);
 }
