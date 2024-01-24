@@ -2,6 +2,7 @@ package com.accounting.accountingapp.controller;
 
 import com.accounting.accountingapp.dto.CompanyDto;
 import com.accounting.accountingapp.dto.ResponseWrapper;
+import com.accounting.accountingapp.entity.Company;
 import com.accounting.accountingapp.service.CompanyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +28,10 @@ public class CompanyController {
                 .body(new ResponseWrapper("Companies successfully retrieved", companyService.listCompanies()));
     }
 
-    @GetMapping("/create")
-    public ResponseEntity<ResponseWrapper> getCompany(@RequestBody CompanyDto companyDto) {
-
-        companyService.save(companyDto);
-        return ResponseEntity.ok(new ResponseWrapper("Company is successfully created", companyDto));
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseWrapper> getCompany(@PathVariable("id") Long id) {
+        CompanyDto companyDto = companyService.getCompanyById(id);
+        return ResponseEntity.ok(new ResponseWrapper("Company is successfully retrieved", companyDto));
     }
 
     @PostMapping("/create")
@@ -61,6 +61,14 @@ public class CompanyController {
         return ResponseEntity.
                 status(HttpStatus.OK)
                 .body(new ResponseWrapper("Company status is successfully updated as 'Passive'", HttpStatus.OK));
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ResponseWrapper> delete(@PathVariable("id") Long id) {
+        companyService.delete(id);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseWrapper("Company is successfully deleted", HttpStatus.OK));
     }
 
 
