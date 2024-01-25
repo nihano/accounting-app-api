@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,32 +28,48 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findByUsername(String username) {
-        //no security right now hardcoded
-        User user = userRepository.findByUsername("root@cydeo.com");
+        //TODO: no security right now hardcoded
+        User user = userRepository.findByUsername("admin@greentech.com");
         return mapperUtil.convert(user, new UserDto());
     }
 
     @Override
     public List<UserDto> listUsers() {
-        //no security right now hardcoded
-        UserDto userDto = findByUsername("root@cydeo.com");
+        //TODO: no security right now hardcoded
+        UserDto userDto = findByUsername("admin@greentech.com");
         List<UserDto> list = new ArrayList<>();
 
         //  4. Admin can only see his/her company's users
-        if (userDto.getRole().getDescription().equalsIgnoreCase("admin")) {
+        if (isAdmin(userDto)) {
             list = userRepository.findAllOrderedByCompanyAndRole().stream()
                     .filter(user -> user.getCompany().getTitle().equals(userDto.getCompany().getTitle()))
                     .map(user -> mapperUtil.convert(user, new UserDto()))
                     .collect(Collectors.toList());
             //     3. Root User can list only admins of all companies
-        } else if (userDto.getRole().getDescription().equalsIgnoreCase("root user")) {
+        } else if (isRoot(userDto)) {
             list = userRepository.findAllOrderedByCompanyAndRole().stream()
                     .filter(user -> user.getRole().getDescription().equalsIgnoreCase("admin"))
                     .map(user -> mapperUtil.convert(user, new UserDto()))
                     .collect(Collectors.toList());
         }
 
+        log.info("User Role: {}", userDto.getRole().getDescription());
+        log.info("User Company: {}", userDto.getCompany().getTitle());
+        log.info("Companies: {}", list.stream().map(userDto1 -> userDto1.getCompany().getTitle()).collect(Collectors.toList()));
+
         return list;
+    }
+
+    @Override
+    public boolean isAdmin(UserDto userDto) {
+        User user = userRepository.findByUsername(userDto.getUsername());
+        return (user.getRole().getDescription().equalsIgnoreCase("admin"));
+    }
+
+    @Override
+    public boolean isRoot(UserDto userDto) {
+        User user = userRepository.findByUsername(userDto.getUsername());
+        return (user.getRole().getDescription().equalsIgnoreCase("root user"));
     }
 
 }
