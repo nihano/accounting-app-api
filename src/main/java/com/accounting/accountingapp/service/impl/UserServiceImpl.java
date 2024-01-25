@@ -1,15 +1,19 @@
 package com.accounting.accountingapp.service.impl;
 
 import com.accounting.accountingapp.dto.UserDto;
+import com.accounting.accountingapp.entity.Company;
+import com.accounting.accountingapp.entity.Role;
 import com.accounting.accountingapp.entity.User;
 import com.accounting.accountingapp.mapper.MapperUtil;
+import com.accounting.accountingapp.repository.CompanyRepository;
+import com.accounting.accountingapp.repository.RoleRepository;
 import com.accounting.accountingapp.repository.UserRepository;
+import com.accounting.accountingapp.service.CompanyService;
 import com.accounting.accountingapp.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,10 +24,15 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final MapperUtil mapperUtil;
+    private final CompanyRepository companyRepository;
+    private final RoleRepository roleRepository;
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil) {
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, CompanyService companyService, CompanyRepository companyRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
+
+        this.companyRepository = companyRepository;
+        this.roleRepository = roleRepository;
     }
 
     @Override
@@ -70,6 +79,39 @@ public class UserServiceImpl implements UserService {
     public boolean isRoot(UserDto userDto) {
         User user = userRepository.findByUsername(userDto.getUsername());
         return (user.getRole().getDescription().equalsIgnoreCase("root user"));
+    }
+
+    @Override
+    public void save(UserDto userDto) {
+        //TODO: only root user or admin can create user. should i add restriction here or will it only come from html?
+        Company company = companyRepository.findByTitle(userDto.getCompany().getTitle());
+        Role role = roleRepository.findByDescription(userDto.getRole().getDescription());
+        User user = new User();
+        user.setCompany(company);
+        user.setRole(role);
+        user.setFirstname(userDto.getFirstname());
+        user.setLastname(userDto.getLastname());
+        user.setUsername(userDto.getUsername());
+        user.setPhone(userDto.getPhone());
+        user.setPassword(userDto.getPassword());
+
+        if (isOnlyAdmin(userDto)){
+            userDto.setIsOnlyAdmin(true);
+        }else {
+            userDto.setIsOnlyAdmin(false);
+        }
+
+        userRepository.save(user);
+    }
+
+    @Override
+    public boolean isOnlyAdmin(UserDto userDto) {
+        String companyTitle = userDto.getCompany().getTitle();
+        List<String> titles = userRepository.findAll().stream()
+                .filter(user1 -> user1.getCompany().getTitle().equalsIgnoreCase(companyTitle))
+                .map(user1 -> user1.getCompany().getTitle())
+                .collect(Collectors.toList());
+        return !titles.contains(companyTitle);
     }
 
 }
