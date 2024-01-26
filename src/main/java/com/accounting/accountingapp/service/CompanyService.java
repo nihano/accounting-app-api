@@ -19,6 +19,7 @@ public interface CompanyService {
     void deactivateCompany(Long id);
     void delete(Long id);
     CompanyDto getCompanyById(Long id);
+    CompanyDto getCompanyByTitle(String title);
 
 
 
