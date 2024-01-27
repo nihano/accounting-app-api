@@ -2,13 +2,10 @@ package com.accounting.accountingapp.controller;
 
 import com.accounting.accountingapp.dto.CompanyDto;
 import com.accounting.accountingapp.dto.ResponseWrapper;
-import com.accounting.accountingapp.entity.Company;
 import com.accounting.accountingapp.service.CompanyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/company")
@@ -38,13 +35,13 @@ public class CompanyController {
     public ResponseEntity<ResponseWrapper> createCompany(@RequestBody CompanyDto companyDto) {
 
         companyService.save(companyDto);
-        return ResponseEntity.ok(new ResponseWrapper("Company is successfully created", companyDto));
+        return ResponseEntity.ok(new ResponseWrapper("Company is successfully created", HttpStatus.OK));
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<ResponseWrapper> updateCompany(@PathVariable("id") Long id, @RequestBody CompanyDto companyDto) {
         companyService.update(companyDto, id);
-        return ResponseEntity.ok(new ResponseWrapper("Company is successfully updated", companyDto));
+        return ResponseEntity.ok(new ResponseWrapper("Company is successfully updated", HttpStatus.OK));
     }
 
     @GetMapping("/activate/{id}")
