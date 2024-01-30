@@ -2,15 +2,13 @@ package com.accounting.accountingapp.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.xml.bind.v2.TODO;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDto {
 
