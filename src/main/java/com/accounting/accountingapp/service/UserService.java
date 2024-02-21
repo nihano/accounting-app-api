@@ -13,5 +13,7 @@ public interface UserService {
     void save(UserDto userDto);
     boolean isOnlyAdmin(UserDto userDto);
 
+    void update(UserDto userDto, Long id);
+
 
 }
