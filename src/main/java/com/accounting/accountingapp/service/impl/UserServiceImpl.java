@@ -114,4 +114,28 @@ public class UserServiceImpl implements UserService {
         return !titles.contains(companyTitle);
     }
 
+    @Override
+    public void update(UserDto userDto, Long id) {
+        // TODO seems like saved in the DB checked on Postman but review this again for what to show in the JSON output.
+        //  it shows null values.
+        //  password saved as raw password and shown in JSON
+        String loggedInUser = "admin@greentech.com";
+        User user = userRepository.findByUsername(loggedInUser);
+        user.setFirstname(userDto.getFirstname());
+        user.setLastname(userDto.getLastname());
+        userDto.setUsername(userDto.getUsername());
+        user.setPhone(userDto.getPhone());
+        user.setPassword(userDto.getPassword());
+        userDto.setIsOnlyAdmin(isAdmin(userDto));
+        if (!isOnlyAdmin(userDto)){
+            Role role = roleRepository.findByDescription(userDto.getRole().getDescription());
+            user.setRole(role);
+
+            Company company = companyRepository.findByTitle(userDto.getCompany().getTitle());
+            user.setCompany(company);
+        }
+
+        userRepository.save(user);
+    }
+
 }
