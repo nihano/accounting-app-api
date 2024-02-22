@@ -14,6 +14,7 @@ public interface UserService {
     boolean isOnlyAdmin(UserDto userDto);
 
     void update(UserDto userDto, Long id);
+    UserDto delete(Long id, UserDto userDto);
 
 
 }
