@@ -43,4 +43,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseWrapper("User is successfully updated", userDto));
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ResponseWrapper> deleteUser(@PathVariable("id") Long id, @RequestBody UserDto userDto){
+        userService.delete(id, userDto);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseWrapper("User is successfully deleted", userDto));
+    }
 }
