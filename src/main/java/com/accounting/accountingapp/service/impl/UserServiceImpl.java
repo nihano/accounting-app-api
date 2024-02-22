@@ -118,7 +118,8 @@ public class UserServiceImpl implements UserService {
     public void update(UserDto userDto, Long id) {
         // TODO seems like saved in the DB checked on Postman but review this again for what to show in the JSON output.
         //  it shows null values.
-        //  password saved as raw password and shown in JSON
+        //  password saved as raw password and shown in JSON.
+        //  if user does not update password password comes as null in the DB
         String loggedInUser = "admin@greentech.com";
         User user = userRepository.findByUsername(loggedInUser);
         user.setFirstname(userDto.getFirstname());
@@ -136,6 +137,22 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.save(user);
+    }
+
+    @Override
+    // TODO I am not sure about this code
+    public UserDto delete(Long id, UserDto userDto) {
+        String loggedInUser = "admin@greentech.com";
+        User user = userRepository.findByUsername(loggedInUser);
+        userDto.setIsOnlyAdmin(isOnlyAdmin(userDto));
+        if (!isOnlyAdmin(userDto)){
+            // TODO how to modify email address before deletion so new user can be created with the same email
+            user.setUsername("");
+            user.setDeleted(true);
+        }
+
+        userRepository.save(user);
+        return userDto;
     }
 
 }
